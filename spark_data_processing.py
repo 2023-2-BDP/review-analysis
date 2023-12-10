@@ -1,8 +1,9 @@
 # 필요한 라이브러리 import
+# fmt:off
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, when, concat, lit, udf
+from pyspark.sql.functions import col, when, concat, lit, udf, substring
 from pyspark.sql.types import IntegerType
-from pyspark import SparkConf
+
 
 # Spark 세션 생성
 spark = SparkSession.builder.appName("bdp_final").getOrCreate()
@@ -46,7 +47,7 @@ reviews = reviews.withColumn('sentiment', split_rating_udf(reviews['rating']))
 negative_count = reviews.filter(reviews['sentiment'] == 0).count()
 negative_count = float(negative_count)
 
-# Sampling and merging
+# 샘플링 후 합치기
 review_count = reviews.count()
 reviews_sample_positive = reviews.sampleBy("sentiment", fractions={1: negative_count/review_count}, seed=1353)
 reviews_sample_negative = reviews.sampleBy("sentiment", fractions={0: negative_count/review_count}, seed=1353)
